@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clone Flat UI Colors - v3.0</title>
+    <title>Clone Flat UI Colors - v5.0</title>
     <style>
         * {
             box-sizing: border-box;
@@ -32,7 +32,12 @@
             z-index: 5;
         }
 
-        header h1 {
+        .header-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-title h1 {
             font-size: 1.5rem;
             letter-spacing: 1px;
             display: flex;
@@ -40,9 +45,15 @@
             gap: 10px;
         }
 
+        .header-title p {
+            font-size: 0.75rem;
+            color: #7f8fa6;
+            margin-top: 4px;
+        }
+
         .version-badge {
             font-size: 0.75rem;
-            background-color: #00a8ff;
+            background-color: #9c88ff;
             color: white;
             padding: 2px 6px;
             border-radius: 4px;
@@ -64,16 +75,29 @@
             cursor: pointer;
             background-color: #f5f6fa;
             color: #2f3640;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, transform 0.1s ease;
         }
 
         select:hover, button:hover {
             background-color: #dcdde1;
         }
 
+        button:active {
+            transform: scale(0.95);
+        }
+
         button#sound-toggle {
             width: 120px;
             text-align: center;
+        }
+
+        button#export-css {
+            background-color: #4cd137;
+            color: white;
+        }
+
+        button#export-css:hover {
+            background-color: #44bd32;
         }
 
         /* Grid Layout untuk Palette */
@@ -82,6 +106,18 @@
             grid-template-columns: repeat(auto-fit, minmax(20%, 1fr));
             flex-grow: 1;
             width: 100%;
+            overflow-y: auto;
+        }
+
+        .empty-favorites {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: #7f8fa6;
+            background-color: #f5f6fa;
+            height: 100%;
         }
 
         /* Kotak Warna */
@@ -92,20 +128,21 @@
             cursor: pointer;
             position: relative;
             transition: background-color 0.3s ease;
+            min-height: 150px;
         }
 
         .color-name {
-            color: rgba(255, 255, 255, 0);
             font-size: 1rem;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: color 0.3s ease;
+            opacity: 0;
+            transition: opacity 0.3s ease;
             pointer-events: none;
         }
 
         .color-box:hover .color-name {
-            color: rgba(255, 255, 255, 0.9);
+            opacity: 1;
         }
 
         /* Notifikasi Animasi "Copied!" */
@@ -115,7 +152,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: inherit;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -133,16 +169,23 @@
         }
 
         .overlay h1 {
-            color: white;
             font-size: 6rem;
-            background: rgba(255, 255, 255, 0.2);
             width: 100%;
             text-align: center;
             padding: 1rem 0;
             text-transform: uppercase;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
             transform: scale(0.1);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .overlay-strip {
+            background: rgba(255, 255, 255, 0.2);
+            width: 100%;
+            text-align: center;
+        }
+        
+        .overlay-strip.dark-strip {
+            background: rgba(0, 0, 0, 0.1);
         }
 
         .overlay.show h1 {
@@ -150,17 +193,16 @@
         }
 
         .overlay p {
-            color: white;
             font-size: 2.5rem;
             margin-top: 1rem;
             font-weight: 500;
         }
 
-        /* Responsive penyesuaian kotak di layar HP */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
                 gap: 1rem;
+                text-align: center;
             }
             .controls {
                 flex-wrap: wrap;
@@ -178,16 +220,22 @@
 <body>
 
     <header>
-        <h1>Flat UI Colors Clone <span class="version-badge">v3.0</span></h1>
+        <div class="header-title">
+            <h1>Flat UI Colors Clone <span class="version-badge">v5.0</span></h1>
+            <p>Klik Kiri untuk Copy | Klik Kanan (Tahan) untuk Favorites</p>
+        </div>
         <div class="controls">
             <button id="sound-toggle">🔊 Sound On</button>
+            <button id="export-css" title="Download Palette as CSS variables">💾 Export CSS</button>
             <select id="palette-selector">
                 <option value="flat-v1">Flat UI Palette v1</option>
                 <option value="aussie">Aussie Palette</option>
+                <option value="favorites">⭐ My Favorites</option>
             </select>
             <select id="format-selector">
                 <option value="hex">HEX (#RRGGBB)</option>
                 <option value="rgb">RGB (R, G, B)</option>
+                <option value="hsl">HSL (H, S%, L%)</option>
             </select>
         </div>
     </header>
@@ -196,12 +244,20 @@
         </div>
 
     <div class="overlay" id="overlay">
-        <h1 id="overlay-msg">COPIED!</h1>
+        <div class="overlay-strip" id="overlay-strip">
+            <h1 id="overlay-msg">COPIED!</h1>
+        </div>
         <p id="copied-text">#000000</p>
     </div>
 
     <script>
-        // Data Palette Warna
+        // Memuat data dari Local Storage (Memory Browser)
+        let savedFavorites = JSON.parse(localStorage.getItem('fui_favorites')) || [];
+        let savedFormat = localStorage.getItem('fui_format') || 'hex';
+        let savedPalette = localStorage.getItem('fui_palette') || 'flat-v1';
+        let isSoundMuted = localStorage.getItem('fui_muted') === 'true';
+
+        // Data Palette Warna Utama
         const palettes = {
             "flat-v1": [
                 { name: "Turquoise", hex: "#1abc9c" }, { name: "Emerald", hex: "#2ecc71" },
@@ -222,35 +278,50 @@
                 { name: "Middle Blue", hex: "#7ed6df" }, { name: "Heliotrope", hex: "#e056fd" },
                 { name: "Exodus Fruit", hex: "#686de0" }, { name: "Deep Koamaru", hex: "#30336b" },
                 { name: "Soaring Eagle", hex: "#95afc0" }
-            ]
+            ],
+            "favorites": savedFavorites
         };
 
-        // Pesan seru acak saat di-copy
         const funMessages = ["COPIED!", "PASTE ME!", "IT'LL ROCK!", "GOT IT!", "RIGHT ONE!", "WILL DO!"];
 
         const paletteContainer = document.getElementById('palette');
         const overlay = document.getElementById('overlay');
+        const overlayStrip = document.getElementById('overlay-strip');
         const overlayMsg = document.getElementById('overlay-msg');
         const copiedTextElem = document.getElementById('copied-text');
         
         const paletteSelector = document.getElementById('palette-selector');
         const formatSelector = document.getElementById('format-selector');
         const soundToggleBtn = document.getElementById('sound-toggle');
+        const exportCssBtn = document.getElementById('export-css');
 
-        // State & Audio Setup
-        let isSoundMuted = false;
+        // Setup awal UI berdasarkan Local Storage
+        formatSelector.value = savedFormat;
+        paletteSelector.value = savedPalette;
+        soundToggleBtn.innerText = isSoundMuted ? "🔇 Sound Off" : "🔊 Sound On";
+
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
-        // Toggle Sound Mute/Unmute
+        // Toggle Sound Mute/Unmute & Save
         soundToggleBtn.addEventListener('click', () => {
             isSoundMuted = !isSoundMuted;
             soundToggleBtn.innerText = isSoundMuted ? "🔇 Sound Off" : "🔊 Sound On";
+            localStorage.setItem('fui_muted', isSoundMuted);
         });
 
-        // Fungsi memainkan efek suara Pop
+        // Deteksi tingkat kecerahan (Luminance)
+        function isLightColor(hex) {
+            let r = parseInt(hex.slice(1, 3), 16);
+            let g = parseInt(hex.slice(3, 5), 16);
+            let b = parseInt(hex.slice(5, 7), 16);
+            let yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+            return yiq >= 128; 
+        }
+
+        // Mainkan Suara Pop
         function playPopSound() {
-            if (isSoundMuted) return; // Jangan mainkan jika di-mute
+            if (isSoundMuted) return; 
 
             if (!audioCtx) audioCtx = new AudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -272,18 +343,39 @@
             oscillator.stop(audioCtx.currentTime + 0.1);
         }
 
-        // Konversi HEX ke RGB
+        // Konversi Format
         function hexToRgb(hex) {
-            let r = parseInt(hex.slice(1, 3), 16);
-            let g = parseInt(hex.slice(3, 5), 16);
-            let b = parseInt(hex.slice(5, 7), 16);
+            let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
             return `rgb(${r}, ${g}, ${b})`;
         }
 
-        // Render kotak warna ke layar
+        function hexToHsl(hex) {
+            let r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255;
+            let max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; }
+            else {
+                let d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+        }
+
+        // Render kotak warna
         function renderPalette(paletteKey) {
             paletteContainer.innerHTML = ''; 
             const colors = palettes[paletteKey];
+
+            if (paletteKey === 'favorites' && colors.length === 0) {
+                paletteContainer.innerHTML = `<div class="empty-favorites">Belum ada warna favorit. Klik kanan pada warna untuk menambahkannya ke sini!</div>`;
+                return;
+            }
 
             colors.forEach(color => {
                 const colorBox = document.createElement('div');
@@ -293,54 +385,112 @@
                 const colorName = document.createElement('span');
                 colorName.classList.add('color-name');
                 colorName.innerText = color.name;
+                colorName.style.color = isLightColor(color.hex) ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)';
 
                 colorBox.appendChild(colorName);
 
-                // Event Klik Kotak Warna
+                // Event Klik Kiri (Copy)
                 colorBox.addEventListener('click', () => {
                     const format = formatSelector.value;
-                    const textToCopy = format === 'hex' ? color.hex.toUpperCase() : hexToRgb(color.hex);
+                    let textToCopy = color.hex.toUpperCase();
+                    if (format === 'rgb') textToCopy = hexToRgb(color.hex);
+                    else if (format === 'hsl') textToCopy = hexToHsl(color.hex);
                     
                     playPopSound();
-                    copyToClipboard(textToCopy);
+                    navigator.clipboard.writeText(textToCopy);
                     showOverlay(color.hex, textToCopy);
+                });
+
+                // Event Klik Kanan (Toggle Favorites)
+                colorBox.addEventListener('contextmenu', (e) => {
+                    e.preventDefault(); // Matikan menu klik kanan default browser
+                    
+                    const existingIndex = palettes['favorites'].findIndex(c => c.hex === color.hex);
+                    if (existingIndex > -1) {
+                        // Hapus dari favorit jika sudah ada
+                        palettes['favorites'].splice(existingIndex, 1);
+                        colorName.innerText = "HAPUS DARI FAVORITES";
+                    } else {
+                        // Tambahkan ke favorit
+                        palettes['favorites'].push(color);
+                        colorName.innerText = "⭐ DITAMBAHKAN";
+                    }
+
+                    // Simpan pembaruan ke Local Storage
+                    localStorage.setItem('fui_favorites', JSON.stringify(palettes['favorites']));
+                    
+                    setTimeout(() => { colorName.innerText = color.name; }, 1000);
+
+                    // Re-render langsung jika sedang berada di tab Favorites
+                    if (paletteSelector.value === 'favorites') {
+                        setTimeout(() => renderPalette('favorites'), 500);
+                    }
                 });
 
                 paletteContainer.appendChild(colorBox);
             });
         }
 
-        // Salin teks ke Clipboard
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).catch(err => {
-                console.error('Gagal menyalin: ', err);
-            });
-        }
-
-        // Tampilkan Overlay dengan Teks Acak
+        // Tampilkan Overlay
         function showOverlay(bgHex, copiedText) {
-            // Pilih pesan acak
             const randomMsg = funMessages[Math.floor(Math.random() * funMessages.length)];
-            
+            const isLight = isLightColor(bgHex);
+
             overlay.style.backgroundColor = bgHex;
             overlayMsg.innerText = randomMsg;
             copiedTextElem.innerText = copiedText;
+
+            const textColor = isLight ? '#333333' : '#ffffff';
+            overlayMsg.style.color = textColor;
+            copiedTextElem.style.color = textColor;
+
+            if (isLight) {
+                overlayStrip.classList.add('dark-strip');
+                overlayMsg.style.textShadow = 'none';
+            } else {
+                overlayStrip.classList.remove('dark-strip');
+                overlayMsg.style.textShadow = '2px 2px 4px rgba(0,0,0,0.2)';
+            }
             
             overlay.classList.add('show');
-
-            // Sembunyikan setelah 1.2 detik
-            setTimeout(() => {
-                overlay.classList.remove('show');
-            }, 1200);
+            setTimeout(() => { overlay.classList.remove('show'); }, 1200);
         }
 
-        // Event Listener Dropdown
-        paletteSelector.addEventListener('change', (e) => {
-            renderPalette(e.target.value);
+        // Export Palette ke CSS
+        exportCssBtn.addEventListener('click', () => {
+            const paletteKey = paletteSelector.value;
+            const colors = palettes[paletteKey];
+            if (colors.length === 0) return alert("Palette kosong, tidak ada yang bisa di-export.");
+            
+            let cssContent = `/* Generated from Flat UI Colors Clone v5.0 */\n:root {\n`;
+            colors.forEach(color => {
+                const varName = color.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                cssContent += `  --color-${varName}: ${color.hex};\n`;
+            });
+            cssContent += `}\n`;
+            
+            const blob = new Blob([cssContent], { type: 'text/css' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${paletteKey}-palette.css`;
+            link.click();
+            URL.revokeObjectURL(link.href);
         });
 
-        // Render pertama kali
-        renderPalette('flat-v1');
+        // Event Listener Format Selector (Save ke LocalStorage)
+        formatSelector.addEventListener('change', (e) => {
+            localStorage.setItem('fui_format', e.target.value);
+        });
+
+        // Event Listener Palette Selector (Ganti Palette & Save ke LocalStorage)
+        paletteSelector.addEventListener('change', (e) => {
+            const selected = e.target.value;
+            localStorage.setItem('fui_palette', selected);
+            renderPalette(selected);
+        });
+
+        // Render inisialisasi awal
+        renderPalette(savedPalette);
     </script>
 
 </body>
