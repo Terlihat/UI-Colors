@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flat UI Colors</title>
+    <title>Clone Flat UI Colors - v2.0</title>
     <style>
         * {
             box-sizing: border-box;
@@ -16,24 +16,49 @@
             background-color: #f5f6fa;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
 
+        /* Navbar Layout */
         header {
-            padding: 2rem;
-            text-align: center;
-            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
             background-color: #2f3640;
             color: white;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 5;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        select {
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: none;
+            outline: none;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #f5f6fa;
+            color: #2f3640;
         }
 
         /* Grid Layout untuk Palette */
         .palette {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(20%, 1fr));
+            flex-grow: 1;
             width: 100%;
-            height: calc(100vh - 100px); /* Sisa tinggi layar setelah header */
         }
 
         /* Kotak Warna */
@@ -43,16 +68,12 @@
             align-items: center;
             cursor: pointer;
             position: relative;
-            transition: transform 0.1s ease;
-        }
-
-        .color-box:active {
-            transform: scale(0.95);
+            transition: background-color 0.3s ease;
         }
 
         .color-name {
             color: rgba(255, 255, 255, 0);
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -62,6 +83,11 @@
 
         .color-box:hover .color-name {
             color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Efek Active (saat diklik) */
+        .color-box.active {
+            z-index: 2;
         }
 
         /* Notifikasi Animasi "Copied!" */
@@ -79,115 +105,193 @@
             z-index: 10;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
         }
 
         .overlay.show {
             opacity: 1;
             z-index: 100;
+            pointer-events: all;
         }
 
         .overlay h1 {
             color: white;
-            font-size: 5rem;
+            font-size: 6rem;
             background: rgba(255, 255, 255, 0.2);
             width: 100%;
             text-align: center;
             padding: 1rem 0;
             text-transform: uppercase;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            transform: scale(0.1);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .overlay.show h1 {
+            transform: scale(1);
         }
 
         .overlay p {
             color: white;
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-top: 1rem;
-            font-weight: 300;
+            font-weight: 500;
+        }
+
+        /* Responsive penyesuaian kotak di layar HP */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .palette {
+                grid-template-columns: repeat(auto-fit, minmax(50%, 1fr));
+            }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>My Flat UI Colors</h1>
-        <p>Klik warna untuk menyalin kode HEX</p>
+        <h1>Flat UI Colors Clone <span style="font-size:0.8rem; color:#7f8fa6;">v2.0</span></h1>
+        <div class="controls">
+            <select id="palette-selector">
+                <option value="flat-v1">Flat UI Palette v1</option>
+                <option value="aussie">Aussie Palette</option>
+            </select>
+            <select id="format-selector">
+                <option value="hex">HEX (#RRGGBB)</option>
+                <option value="rgb">RGB (R, G, B)</option>
+            </select>
+        </div>
     </header>
 
     <div class="palette" id="palette">
-        <!-- Kotak warna akan di-generate oleh JavaScript -->
-    </div>
+        </div>
 
-    <!-- Overlay Notifikasi Copy -->
     <div class="overlay" id="overlay">
         <h1>Copied!</h1>
-        <p id="copied-hex">#000000</p>
+        <p id="copied-text">#000000</p>
     </div>
 
     <script>
-        // Data Warna (Bisa ditambahkan sesuai keinginan)
-        const colors = [
-            { name: "Turquoise", hex: "#1abc9c" },
-            { name: "Emerald", hex: "#2ecc71" },
-            { name: "Peter River", hex: "#3498db" },
-            { name: "Amethyst", hex: "#9b59b6" },
-            { name: "Wet Asphalt", hex: "#34495e" },
-            { name: "Green Sea", hex: "#16a085" },
-            { name: "Nephritis", hex: "#27ae60" },
-            { name: "Belize Hole", hex: "#2980b9" },
-            { name: "Wisteria", hex: "#8e44ad" },
-            { name: "Midnight Blue", hex: "#2c3e50" },
-            { name: "Sun Flower", hex: "#f1c40f" },
-            { name: "Carrot", hex: "#e67e22" },
-            { name: "Alizarin", hex: "#e74c3c" },
-            { name: "Clouds", hex: "#ecf0f1" },
-            { name: "Concrete", hex: "#95a5a6" }
-        ];
+        // Data Palette Warna
+        const palettes = {
+            "flat-v1": [
+                { name: "Turquoise", hex: "#1abc9c" }, { name: "Emerald", hex: "#2ecc71" },
+                { name: "Peter River", hex: "#3498db" }, { name: "Amethyst", hex: "#9b59b6" },
+                { name: "Wet Asphalt", hex: "#34495e" }, { name: "Green Sea", hex: "#16a085" },
+                { name: "Nephritis", hex: "#27ae60" }, { name: "Belize Hole", hex: "#2980b9" },
+                { name: "Wisteria", hex: "#8e44ad" }, { name: "Midnight Blue", hex: "#2c3e50" },
+                { name: "Sun Flower", hex: "#f1c40f" }, { name: "Carrot", hex: "#e67e22" },
+                { name: "Alizarin", hex: "#e74c3c" }, { name: "Clouds", hex: "#ecf0f1" },
+                { name: "Concrete", hex: "#95a5a6" }
+            ],
+            "aussie": [
+                { name: "Beekeeper", hex: "#f6e58d" }, { name: "Spiced Nectarine", hex: "#ffbe76" },
+                { name: "Pink Glamour", hex: "#ff7979" }, { name: "June Bud", hex: "#badc58" },
+                { name: "Coastal Breeze", hex: "#dff9fb" }, { name: "Turbo", hex: "#f9ca24" },
+                { name: "Quince Jelly", hex: "#f0932b" }, { name: "Carmine Pink", hex: "#eb4d4b" },
+                { name: "Pure Apple", hex: "#6ab04c" }, { name: "Hint Of Ice Pack", hex: "#c7ecee" },
+                { name: "Middle Blue", hex: "#7ed6df" }, { name: "Heliotrope", hex: "#e056fd" },
+                { name: "Exodus Fruit", hex: "#686de0" }, { name: "Deep Koamaru", hex: "#30336b" },
+                { name: "Soaring Eagle", hex: "#95afc0" }
+            ]
+        };
 
         const paletteContainer = document.getElementById('palette');
         const overlay = document.getElementById('overlay');
-        const copiedHexText = document.getElementById('copied-hex');
+        const copiedTextElem = document.getElementById('copied-text');
+        const paletteSelector = document.getElementById('palette-selector');
+        const formatSelector = document.getElementById('format-selector');
 
-        // Fungsi untuk membuat kotak warna di HTML
-        colors.forEach(color => {
-            const colorBox = document.createElement('div');
-            colorBox.classList.add('color-box');
-            colorBox.style.backgroundColor = color.hex;
+        // Fungsi inisialisasi Audio Context (untuk suara Pop)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function playPopSound() {
+            if (!audioCtx) audioCtx = new AudioContext();
             
-            const colorName = document.createElement('span');
-            colorName.classList.add('color-name');
-            colorName.innerText = color.name; // Atau bisa diganti color.hex
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
+        }
 
-            colorBox.appendChild(colorName);
+        // Fungsi mengubah HEX ke RGB
+        function hexToRgb(hex) {
+            let r = parseInt(hex.slice(1, 3), 16);
+            let g = parseInt(hex.slice(3, 5), 16);
+            let b = parseInt(hex.slice(5, 7), 16);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
 
-            // Event listener ketika kotak diklik
-            colorBox.addEventListener('click', () => {
-                copyToClipboard(color.hex);
-                showOverlay(color.hex);
+        // Fungsi merender kotak warna ke layar
+        function renderPalette(paletteKey) {
+            paletteContainer.innerHTML = ''; // Bersihkan container
+            const colors = palettes[paletteKey];
+
+            colors.forEach(color => {
+                const colorBox = document.createElement('div');
+                colorBox.classList.add('color-box');
+                colorBox.style.backgroundColor = color.hex;
+                
+                const colorName = document.createElement('span');
+                colorName.classList.add('color-name');
+                colorName.innerText = color.name;
+
+                colorBox.appendChild(colorName);
+
+                // Event Listener saat di-klik
+                colorBox.addEventListener('click', () => {
+                    const format = formatSelector.value;
+                    const textToCopy = format === 'hex' ? color.hex.toUpperCase() : hexToRgb(color.hex);
+                    
+                    playPopSound();
+                    copyToClipboard(textToCopy);
+                    showOverlay(color.hex, textToCopy);
+                });
+
+                paletteContainer.appendChild(colorBox);
             });
-
-            paletteContainer.appendChild(colorBox);
-        });
+        }
 
         // Fungsi menyalin ke clipboard
-        function copyToClipboard(hex) {
-            navigator.clipboard.writeText(hex).then(() => {
-                console.log(`Berhasil menyalin: ${hex}`);
-            }).catch(err => {
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).catch(err => {
                 console.error('Gagal menyalin text: ', err);
             });
         }
 
-        // Fungsi menampilkan animasi full-screen "Copied!"
-        function showOverlay(hex) {
-            overlay.style.backgroundColor = hex; // Samakan warna background overlay
-            copiedHexText.innerText = hex;
+        // Fungsi menampilkan overlay
+        function showOverlay(bgHex, copiedText) {
+            overlay.style.backgroundColor = bgHex;
+            copiedTextElem.innerText = copiedText;
             overlay.classList.add('show');
 
-            // Sembunyikan overlay setelah 1.5 detik
             setTimeout(() => {
                 overlay.classList.remove('show');
-            }, 1500);
+            }, 1200);
         }
+
+        // Event Listeners untuk dropdown
+        paletteSelector.addEventListener('change', (e) => {
+            renderPalette(e.target.value);
+        });
+
+        // Render awal saat halaman dimuat
+        renderPalette('flat-v1');
     </script>
 
 </body>
