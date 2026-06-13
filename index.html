@@ -3,8 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clone Flat UI Colors - v5.0</title>
+    <title>Clone Flat UI Colors - v6.0</title>
     <style>
+        /* CSS Variables untuk Theming (Terang/Gelap) */
+        :root {
+            --bg-color: #f5f6fa;
+            --header-bg: #2f3640;
+            --header-text: #ffffff;
+            --control-bg: #f5f6fa;
+            --control-text: #2f3640;
+            --control-hover: #dcdde1;
+            --empty-text: #7f8fa6;
+        }
+
+        body.dark-mode {
+            --bg-color: #1e272e;
+            --header-bg: #111111;
+            --header-text: #f5f6fa;
+            --control-bg: #2f3640;
+            --control-text: #f5f6fa;
+            --control-hover: #485460;
+            --empty-text: #808e9b;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,11 +34,12 @@
         }
 
         body {
-            background-color: #f5f6fa;
+            background-color: var(--bg-color);
             display: flex;
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
+            transition: background-color 0.3s ease;
         }
 
         /* Navbar Layout */
@@ -26,10 +48,11 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem 2rem;
-            background-color: #2f3640;
-            color: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             z-index: 5;
+            transition: background-color 0.3s ease;
         }
 
         .header-title {
@@ -47,13 +70,13 @@
 
         .header-title p {
             font-size: 0.75rem;
-            color: #7f8fa6;
+            color: #a4b0be;
             margin-top: 4px;
         }
 
         .version-badge {
             font-size: 0.75rem;
-            background-color: #9c88ff;
+            background-color: #ff4757;
             color: white;
             padding: 2px 6px;
             border-radius: 4px;
@@ -73,31 +96,31 @@
             outline: none;
             font-weight: bold;
             cursor: pointer;
-            background-color: #f5f6fa;
-            color: #2f3640;
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            background-color: var(--control-bg);
+            color: var(--control-text);
+            transition: background-color 0.2s ease, transform 0.1s ease, color 0.2s ease;
         }
 
         select:hover, button:hover {
-            background-color: #dcdde1;
+            background-color: var(--control-hover);
         }
 
         button:active {
             transform: scale(0.95);
         }
 
-        button#sound-toggle {
+        button#sound-toggle, button#theme-toggle {
             width: 120px;
             text-align: center;
         }
 
         button#export-css {
-            background-color: #4cd137;
+            background-color: #2ed573;
             color: white;
         }
 
         button#export-css:hover {
-            background-color: #44bd32;
+            background-color: #27ae60;
         }
 
         /* Grid Layout untuk Palette */
@@ -115,9 +138,10 @@
             justify-content: center;
             align-items: center;
             font-size: 1.5rem;
-            color: #7f8fa6;
-            background-color: #f5f6fa;
+            color: var(--empty-text);
             height: 100%;
+            text-align: center;
+            padding: 2rem;
         }
 
         /* Kotak Warna */
@@ -139,10 +163,35 @@
             opacity: 0;
             transition: opacity 0.3s ease;
             pointer-events: none;
+            text-align: center;
+            padding: 0 10px;
         }
 
         .color-box:hover .color-name {
             opacity: 1;
+        }
+
+        /* Tombol Add Color di Favorites */
+        .add-color-box {
+            background-color: transparent;
+            border: 3px dashed var(--empty-text);
+        }
+
+        .add-color-box .color-name {
+            opacity: 1;
+            color: var(--empty-text);
+        }
+
+        .add-color-box:hover {
+            background-color: rgba(127, 143, 166, 0.1);
+        }
+
+        #custom-color-picker {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
         }
 
         /* Notifikasi Animasi "Copied!" */
@@ -198,7 +247,7 @@
             font-weight: 500;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             header {
                 flex-direction: column;
                 gap: 1rem;
@@ -208,6 +257,12 @@
                 flex-wrap: wrap;
                 justify-content: center;
             }
+            .palette {
+                grid-template-columns: repeat(auto-fit, minmax(33.33%, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
             .palette {
                 grid-template-columns: repeat(auto-fit, minmax(50%, 1fr));
             }
@@ -221,10 +276,11 @@
 
     <header>
         <div class="header-title">
-            <h1>Flat UI Colors Clone <span class="version-badge">v5.0</span></h1>
-            <p>Klik Kiri untuk Copy | Klik Kanan (Tahan) untuk Favorites</p>
+            <h1>Flat UI Colors Clone <span class="version-badge">v6.0</span></h1>
+            <p>Klik Kiri: Copy | Klik Kanan: Add/Remove Favorites</p>
         </div>
         <div class="controls">
+            <button id="theme-toggle">🌙 Dark Mode</button>
             <button id="sound-toggle">🔊 Sound On</button>
             <button id="export-css" title="Download Palette as CSS variables">💾 Export CSS</button>
             <select id="palette-selector">
@@ -251,11 +307,15 @@
     </div>
 
     <script>
-        // Memuat data dari Local Storage (Memory Browser)
+        // Memuat data dari Local Storage
         let savedFavorites = JSON.parse(localStorage.getItem('fui_favorites')) || [];
         let savedFormat = localStorage.getItem('fui_format') || 'hex';
         let savedPalette = localStorage.getItem('fui_palette') || 'flat-v1';
         let isSoundMuted = localStorage.getItem('fui_muted') === 'true';
+        let isDarkMode = localStorage.getItem('fui_darkmode') === 'true';
+
+        // Terapkan Dark Mode di awal jika tersimpan
+        if (isDarkMode) document.body.classList.add('dark-mode');
 
         // Data Palette Warna Utama
         const palettes = {
@@ -282,7 +342,7 @@
             "favorites": savedFavorites
         };
 
-        const funMessages = ["COPIED!", "PASTE ME!", "IT'LL ROCK!", "GOT IT!", "RIGHT ONE!", "WILL DO!"];
+        const funMessages = ["COPIED!", "PASTE ME!", "IT'LL ROCK!", "GOT IT!", "RIGHT ONE!", "PERFECT!"];
 
         const paletteContainer = document.getElementById('palette');
         const overlay = document.getElementById('overlay');
@@ -293,28 +353,36 @@
         const paletteSelector = document.getElementById('palette-selector');
         const formatSelector = document.getElementById('format-selector');
         const soundToggleBtn = document.getElementById('sound-toggle');
+        const themeToggleBtn = document.getElementById('theme-toggle');
         const exportCssBtn = document.getElementById('export-css');
 
-        // Setup awal UI berdasarkan Local Storage
+        // Setup UI awal
         formatSelector.value = savedFormat;
         paletteSelector.value = savedPalette;
         soundToggleBtn.innerText = isSoundMuted ? "🔇 Sound Off" : "🔊 Sound On";
+        themeToggleBtn.innerText = isDarkMode ? "☀️ Light Mode" : "🌙 Dark Mode";
 
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
-        // Toggle Sound Mute/Unmute & Save
+        // Toggle Theme (Dark/Light)
+        themeToggleBtn.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            themeToggleBtn.innerText = isDarkMode ? "☀️ Light Mode" : "🌙 Dark Mode";
+            localStorage.setItem('fui_darkmode', isDarkMode);
+        });
+
+        // Toggle Sound Mute/Unmute
         soundToggleBtn.addEventListener('click', () => {
             isSoundMuted = !isSoundMuted;
             soundToggleBtn.innerText = isSoundMuted ? "🔇 Sound Off" : "🔊 Sound On";
             localStorage.setItem('fui_muted', isSoundMuted);
         });
 
-        // Deteksi tingkat kecerahan (Luminance)
+        // Deteksi Luminance
         function isLightColor(hex) {
-            let r = parseInt(hex.slice(1, 3), 16);
-            let g = parseInt(hex.slice(3, 5), 16);
-            let b = parseInt(hex.slice(5, 7), 16);
+            let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
             let yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
             return yiq >= 128; 
         }
@@ -322,7 +390,6 @@
         // Mainkan Suara Pop
         function playPopSound() {
             if (isSoundMuted) return; 
-
             if (!audioCtx) audioCtx = new AudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
             
@@ -372,8 +439,43 @@
             paletteContainer.innerHTML = ''; 
             const colors = palettes[paletteKey];
 
+            // Render tombol "+ ADD COLOR" khusus di mode Favorites
+            if (paletteKey === 'favorites') {
+                const addBox = document.createElement('div');
+                addBox.classList.add('color-box', 'add-color-box');
+                
+                const addText = document.createElement('span');
+                addText.classList.add('color-name');
+                addText.innerText = "+ ADD COLOR";
+
+                const colorInput = document.createElement('input');
+                colorInput.type = 'color';
+                colorInput.id = 'custom-color-picker';
+
+                // Ketika warna baru dipilih dari sistem picker
+                colorInput.addEventListener('input', (e) => {
+                    const newHex = e.target.value;
+                    let newName = prompt("Beri nama untuk warna ini:", "My Custom Color");
+                    
+                    if (newName !== null) { // Jika user tidak membatalkan prompt
+                        if (newName.trim() === '') newName = "Custom Color";
+                        palettes['favorites'].push({ name: newName, hex: newHex });
+                        localStorage.setItem('fui_favorites', JSON.stringify(palettes['favorites']));
+                        renderPalette('favorites');
+                    }
+                });
+
+                addBox.appendChild(addText);
+                addBox.appendChild(colorInput);
+                paletteContainer.appendChild(addBox);
+            }
+
+            // Pesan kosong jika di favorites dan belum ada warna
             if (paletteKey === 'favorites' && colors.length === 0) {
-                paletteContainer.innerHTML = `<div class="empty-favorites">Belum ada warna favorit. Klik kanan pada warna untuk menambahkannya ke sini!</div>`;
+                const emptyMsg = document.createElement('div');
+                emptyMsg.classList.add('empty-favorites');
+                emptyMsg.innerText = "Belum ada warna. Klik kanan pada warna dari palette lain, atau klik + ADD COLOR!";
+                paletteContainer.appendChild(emptyMsg);
                 return;
             }
 
@@ -390,7 +492,10 @@
                 colorBox.appendChild(colorName);
 
                 // Event Klik Kiri (Copy)
-                colorBox.addEventListener('click', () => {
+                colorBox.addEventListener('click', (e) => {
+                    // Mencegah trigger jika yang diklik adalah area input color picker (bug prevention)
+                    if(e.target.tagName.toLowerCase() === 'input') return;
+
                     const format = formatSelector.value;
                     let textToCopy = color.hex.toUpperCase();
                     if (format === 'rgb') textToCopy = hexToRgb(color.hex);
@@ -401,27 +506,24 @@
                     showOverlay(color.hex, textToCopy);
                 });
 
-                // Event Klik Kanan (Toggle Favorites)
+                // Event Klik Kanan (Toggle Favorites / Hapus)
                 colorBox.addEventListener('contextmenu', (e) => {
-                    e.preventDefault(); // Matikan menu klik kanan default browser
+                    e.preventDefault(); 
                     
                     const existingIndex = palettes['favorites'].findIndex(c => c.hex === color.hex);
                     if (existingIndex > -1) {
-                        // Hapus dari favorit jika sudah ada
                         palettes['favorites'].splice(existingIndex, 1);
                         colorName.innerText = "HAPUS DARI FAVORITES";
                     } else {
-                        // Tambahkan ke favorit
                         palettes['favorites'].push(color);
                         colorName.innerText = "⭐ DITAMBAHKAN";
                     }
 
-                    // Simpan pembaruan ke Local Storage
                     localStorage.setItem('fui_favorites', JSON.stringify(palettes['favorites']));
                     
                     setTimeout(() => { colorName.innerText = color.name; }, 1000);
 
-                    // Re-render langsung jika sedang berada di tab Favorites
+                    // Re-render langsung jika di tab Favorites
                     if (paletteSelector.value === 'favorites') {
                         setTimeout(() => renderPalette('favorites'), 500);
                     }
@@ -462,9 +564,10 @@
             const colors = palettes[paletteKey];
             if (colors.length === 0) return alert("Palette kosong, tidak ada yang bisa di-export.");
             
-            let cssContent = `/* Generated from Flat UI Colors Clone v5.0 */\n:root {\n`;
-            colors.forEach(color => {
-                const varName = color.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            let cssContent = `/* Generated from Flat UI Colors Clone v6.0 */\n:root {\n`;
+            colors.forEach((color, index) => {
+                let varName = color.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                if(!varName) varName = `color-${index}`;
                 cssContent += `  --color-${varName}: ${color.hex};\n`;
             });
             cssContent += `}\n`;
@@ -477,12 +580,12 @@
             URL.revokeObjectURL(link.href);
         });
 
-        // Event Listener Format Selector (Save ke LocalStorage)
+        // Event Listener Format Selector 
         formatSelector.addEventListener('change', (e) => {
             localStorage.setItem('fui_format', e.target.value);
         });
 
-        // Event Listener Palette Selector (Ganti Palette & Save ke LocalStorage)
+        // Event Listener Palette Selector
         paletteSelector.addEventListener('change', (e) => {
             const selected = e.target.value;
             localStorage.setItem('fui_palette', selected);
