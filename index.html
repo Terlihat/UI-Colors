@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flat UI Colors</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
         /* CSS Variables */
         :root {
@@ -415,7 +416,7 @@
 
         document.getElementById('export-css').addEventListener('click', () => {
             const colors = palettes[paletteSelector.value]; if (!colors.length) return alert("Palette kosong!");
-            let css = `/* Generated from Flat UI Clone v10.0 */\n:root {\n`;
+            let css = `/* Generated from Flat UI v10.0 */\n:root {\n`;
             colors.forEach((c, i) => { css += `  --color-${(c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') || `color-${i}`)}: ${c.hex};\n`; }); css += `}\n`;
             const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([css], { type: 'text/css' }));
             link.download = `${paletteSelector.value}-palette.css`; link.click();
