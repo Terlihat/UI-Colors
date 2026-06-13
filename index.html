@@ -3,286 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clone Flat UI Colors - v7.0</title>
+    <title>Clone Flat UI Colors - v8.0</title>
     <style>
-        /* CSS Variables untuk Theming */
+        /* CSS Variables */
         :root {
-            --bg-color: #f5f6fa;
-            --header-bg: #2f3640;
-            --header-text: #ffffff;
-            --control-bg: #f5f6fa;
-            --control-text: #2f3640;
-            --control-hover: #dcdde1;
-            --empty-text: #7f8fa6;
-            --panel-bg: #ffffff;
-            --panel-text: #2f3640;
-            --panel-border: #dcdde1;
+            --bg-color: #f5f6fa; --header-bg: #2f3640; --header-text: #ffffff;
+            --control-bg: #f5f6fa; --control-text: #2f3640; --control-hover: #dcdde1;
+            --empty-text: #7f8fa6; --panel-bg: #ffffff; --panel-text: #2f3640; --panel-border: #dcdde1;
         }
 
         body.dark-mode {
-            --bg-color: #1e272e;
-            --header-bg: #111111;
-            --header-text: #f5f6fa;
-            --control-bg: #2f3640;
-            --control-text: #f5f6fa;
-            --control-hover: #485460;
-            --empty-text: #808e9b;
-            --panel-bg: #1e272e;
-            --panel-text: #f5f6fa;
-            --panel-border: #353b48;
+            --bg-color: #1e272e; --header-bg: #111111; --header-text: #f5f6fa;
+            --control-bg: #2f3640; --control-text: #f5f6fa; --control-hover: #485460;
+            --empty-text: #808e9b; --panel-bg: #1e272e; --panel-text: #f5f6fa; --panel-border: #353b48;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
-            background-color: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-            transition: background-color 0.3s ease;
+            background-color: var(--bg-color); display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden; transition: background-color 0.3s ease;
         }
 
         /* Navbar Layout */
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background-color: var(--header-bg);
-            color: var(--header-text);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            z-index: 5;
-            transition: background-color 0.3s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem 2rem; background-color: var(--header-bg); color: var(--header-text);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); z-index: 5; transition: background-color 0.3s ease;
         }
 
-        .header-title {
-            display: flex;
-            flex-direction: column;
-        }
+        .header-title h1 { font-size: 1.5rem; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .header-title p { font-size: 0.75rem; color: #a4b0be; margin-top: 4px; }
+        .version-badge { font-size: 0.75rem; background-color: #e1b12c; color: #2f3640; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
 
-        .header-title h1 {
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-title p {
-            font-size: 0.75rem;
-            color: #a4b0be;
-            margin-top: 4px;
-        }
-
-        .version-badge {
-            font-size: 0.75rem;
-            background-color: #ffa502;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-
+        .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
         select, button {
-            padding: 0.5rem 0.8rem;
-            border-radius: 4px;
-            border: none;
-            outline: none;
-            font-weight: bold;
-            cursor: pointer;
-            background-color: var(--control-bg);
-            color: var(--control-text);
-            transition: background-color 0.2s ease, transform 0.1s ease, color 0.2s ease;
-            font-size: 0.85rem;
+            padding: 0.5rem 0.8rem; border-radius: 4px; border: none; outline: none; font-weight: bold;
+            cursor: pointer; background-color: var(--control-bg); color: var(--control-text);
+            transition: all 0.2s ease; font-size: 0.85rem;
         }
-
-        select:hover, button:hover {
-            background-color: var(--control-hover);
-        }
-
-        button:active {
-            transform: scale(0.95);
-        }
+        select:hover, button:hover { background-color: var(--control-hover); }
+        button:active { transform: scale(0.95); }
 
         button#export-css { background-color: #2ed573; color: white; }
         button#export-css:hover { background-color: #27ae60; }
-
         button#history-toggle { background-color: #3742fa; color: white; }
         button#history-toggle:hover { background-color: #5352ed; }
 
-        /* Grid Layout untuk Palette */
-        .palette {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(20%, 1fr));
-            flex-grow: 1;
-            width: 100%;
-            overflow-y: auto;
-        }
+        /* Palette Grid */
+        .palette { display: grid; grid-template-columns: repeat(auto-fit, minmax(20%, 1fr)); flex-grow: 1; width: 100%; overflow-y: auto; }
+        .empty-favorites { grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: var(--empty-text); height: 100%; text-align: center; padding: 2rem; }
 
-        .empty-favorites {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            color: var(--empty-text);
-            height: 100%;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        /* Kotak Warna */
-        .color-box {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            position: relative;
-            transition: background-color 0.3s ease;
-            min-height: 150px;
-        }
-
-        .color-name {
-            font-size: 1rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-            text-align: center;
-            padding: 0 10px;
-        }
-
+        /* Color Box */
+        .color-box { display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; transition: background-color 0.3s ease; min-height: 150px; }
+        .color-name { font-size: 1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; text-align: center; padding: 0 10px; }
         .color-box:hover .color-name { opacity: 1; }
 
-        .add-color-box {
-            background-color: transparent;
-            border: 3px dashed var(--empty-text);
+        /* Tints Button */
+        .tints-btn {
+            position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.3); border: none;
+            color: #fff; padding: 5px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;
+            opacity: 0; transition: opacity 0.2s ease, background 0.2s ease; font-weight: bold;
         }
+        .color-box:hover .tints-btn { opacity: 1; }
+        .tints-btn:hover { background: rgba(255,255,255,0.6); }
+        .tints-btn.dark-btn { color: #333; background: rgba(0,0,0,0.1); }
+        .tints-btn.dark-btn:hover { background: rgba(0,0,0,0.3); }
+
+        /* Favorites Add Box */
+        .add-color-box { background-color: transparent; border: 3px dashed var(--empty-text); }
         .add-color-box .color-name { opacity: 1; color: var(--empty-text); }
         .add-color-box:hover { background-color: rgba(127, 143, 166, 0.1); }
         #custom-color-picker { opacity: 0; position: absolute; width: 100%; height: 100%; cursor: pointer; }
 
-        /* Notifikasi Animasi "Copied!" */
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 50; opacity: 0; pointer-events: none;
-            transition: opacity 0.2s ease;
-        }
+        /* Main Overlay */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
         .overlay.show { opacity: 1; z-index: 9999; pointer-events: all; }
-        .overlay h1 {
-            font-size: 6rem; width: 100%; text-align: center; padding: 1rem 0;
-            text-transform: uppercase; transform: scale(0.1);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .overlay h1 { font-size: 6rem; width: 100%; text-align: center; padding: 1rem 0; text-transform: uppercase; transform: scale(0.1); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .overlay-strip { background: rgba(255, 255, 255, 0.2); width: 100%; text-align: center; }
         .overlay-strip.dark-strip { background: rgba(0, 0, 0, 0.1); }
         .overlay.show h1 { transform: scale(1); }
         .overlay p { font-size: 2.5rem; margin-top: 1rem; font-weight: 500; }
 
-        /* --- FITUR BARU: HISTORY PANEL --- */
-        .history-panel {
-            position: fixed;
-            top: 0;
-            right: -350px;
-            width: 350px;
-            height: 100vh;
-            background-color: var(--panel-bg);
-            color: var(--panel-text);
-            box-shadow: -4px 0 15px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-        }
-
+        /* History Panel */
+        .history-panel { position: fixed; top: 0; right: -350px; width: 350px; height: 100vh; background-color: var(--panel-bg); color: var(--panel-text); box-shadow: -4px 0 15px rgba(0,0,0,0.1); z-index: 1000; transition: right 0.3s ease; display: flex; flex-direction: column; }
         .history-panel.open { right: 0; }
-
-        .history-backdrop {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
+        .history-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .history-backdrop.open { opacity: 1; pointer-events: all; }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--panel-border);
-            background-color: var(--header-bg);
-            color: var(--header-text);
-        }
-
-        .history-header h2 { font-size: 1.2rem; }
-        .close-history { background: transparent; color: white; font-size: 1.5rem; padding: 0; }
-        .close-history:hover { background: transparent; color: #ff4757; }
-
-        .history-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        }
-
-        .history-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            background-color: var(--control-bg);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .history-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .history-color-blob {
-            width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1);
-        }
-
-        .history-info { display: flex; flex-direction: column; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--panel-border); background-color: var(--header-bg); color: var(--header-text); }
+        .close-btn { background: transparent; color: white; font-size: 1.5rem; padding: 0; }
+        .close-btn:hover { color: #ff4757; }
+        .history-list { flex-grow: 1; overflow-y: auto; padding: 1rem; }
+        .history-item { display: flex; align-items: center; gap: 15px; padding: 10px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; background-color: var(--control-bg); transition: transform 0.2s ease; }
+        .history-item:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .history-color-blob { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); }
         .history-val { font-weight: bold; font-size: 0.9rem; }
         .history-name { font-size: 0.75rem; color: var(--empty-text); }
+        .clear-history-btn { margin: 1rem; padding: 0.8rem; background-color: #ff4757; color: white; text-align: center; border-radius: 4px; }
 
-        .clear-history-btn {
-            margin: 1rem; padding: 0.8rem;
-            background-color: #ff4757; color: white;
-            text-align: center; border-radius: 4px;
+        /* --- FITUR BARU: SHADES MODAL --- */
+        .shades-modal {
+            position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: var(--bg-color);
+            z-index: 2000; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
+            display: flex; flex-direction: column;
         }
-        .clear-history-btn:hover { background-color: #ff6b81; }
+        .shades-modal.open { top: 0; }
+        
+        .shades-header {
+            display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;
+            background: var(--header-bg); color: var(--header-text);
+        }
+        .shades-info { display: flex; flex-direction: column; gap: 5px;}
+        .wcag-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; display: inline-block; }
+        .wcag-pass { background: #2ed573; color: #2f3640; }
+        .wcag-fail { background: #ff4757; color: white; }
 
-        /* Responsive Settings */
+        .shades-container {
+            display: grid; grid-template-columns: repeat(10, 1fr); flex-grow: 1; width: 100%;
+        }
+        .shade-box {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; position: relative; transition: transform 0.2s ease;
+        }
+        .shade-box:hover { transform: scale(1.05); z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.3); }
+        .shade-pct { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
+        .shade-hex { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+
         @media (max-width: 900px) {
             header { flex-direction: column; gap: 1rem; text-align: center; }
             .controls { justify-content: center; }
             .palette { grid-template-columns: repeat(auto-fit, minmax(33.33%, 1fr)); }
+            .shades-container { grid-template-columns: repeat(2, 1fr); overflow-y: auto; }
         }
         @media (max-width: 600px) {
             .palette { grid-template-columns: repeat(auto-fit, minmax(50%, 1fr)); }
@@ -295,14 +146,14 @@
 
     <header>
         <div class="header-title">
-            <h1>Flat UI Colors Clone <span class="version-badge">v7.0</span></h1>
-            <p>Klik Kiri: Copy | Klik Kanan: Add/Remove Favorites</p>
+            <h1>Flat UI Colors Clone <span class="version-badge">v8.0</span></h1>
+            <p>Klik Kiri: Copy | Klik Kanan: Favorites | Ikon 🔍: Tints & Shades</p>
         </div>
         <div class="controls">
             <button id="theme-toggle">🌙 Dark</button>
             <button id="sound-toggle">🔊 Sound</button>
             <button id="history-toggle">🕒 History</button>
-            <button id="export-css" title="Download Palette">💾 Export</button>
+            <button id="export-css">💾 Export</button>
             <select id="palette-selector">
                 <option value="flat-v1">Flat UI v1</option>
                 <option value="aussie">Aussie Palette</option>
@@ -316,29 +167,38 @@
         </div>
     </header>
 
-    <div class="palette" id="palette">
-        </div>
+    <div class="palette" id="palette"></div>
 
     <div class="overlay" id="overlay">
-        <div class="overlay-strip" id="overlay-strip">
-            <h1 id="overlay-msg">COPIED!</h1>
-        </div>
+        <div class="overlay-strip" id="overlay-strip"><h1 id="overlay-msg">COPIED!</h1></div>
         <p id="copied-text">#000000</p>
     </div>
 
     <div class="history-backdrop" id="history-backdrop"></div>
     <div class="history-panel" id="history-panel">
         <div class="history-header">
-            <h2>Copy History</h2>
-            <button class="close-history" id="close-history">&times;</button>
+            <h2>Copy History</h2><button class="close-btn" id="close-history">&times;</button>
         </div>
-        <div class="history-list" id="history-list">
-            </div>
+        <div class="history-list" id="history-list"></div>
         <button class="clear-history-btn" id="clear-history">Clear History</button>
     </div>
 
+    <div class="shades-modal" id="shades-modal">
+        <div class="shades-header">
+            <div class="shades-info">
+                <h2 id="shade-title">Variasi Warna</h2>
+                <div>
+                    <span class="wcag-badge" id="wcag-white">Teks Putih: Mengecek...</span>
+                    <span class="wcag-badge" id="wcag-black">Teks Hitam: Mengecek...</span>
+                </div>
+            </div>
+            <button class="close-btn" id="close-shades" style="font-size: 2rem;">&times;</button>
+        </div>
+        <div class="shades-container" id="shades-container"></div>
+    </div>
+
     <script>
-        // Data Local Storage
+        // --- DATA & STATE ---
         let savedFavorites = JSON.parse(localStorage.getItem('fui_favorites')) || [];
         let copyHistory = JSON.parse(localStorage.getItem('fui_history')) || [];
         let savedFormat = localStorage.getItem('fui_format') || 'hex';
@@ -349,294 +209,280 @@
         if (isDarkMode) document.body.classList.add('dark-mode');
 
         const palettes = {
-            "flat-v1": [
-                { name: "Turquoise", hex: "#1abc9c" }, { name: "Emerald", hex: "#2ecc71" },
-                { name: "Peter River", hex: "#3498db" }, { name: "Amethyst", hex: "#9b59b6" },
-                { name: "Wet Asphalt", hex: "#34495e" }, { name: "Green Sea", hex: "#16a085" },
-                { name: "Nephritis", hex: "#27ae60" }, { name: "Belize Hole", hex: "#2980b9" },
-                { name: "Wisteria", hex: "#8e44ad" }, { name: "Midnight Blue", hex: "#2c3e50" },
-                { name: "Sun Flower", hex: "#f1c40f" }, { name: "Carrot", hex: "#e67e22" },
-                { name: "Alizarin", hex: "#e74c3c" }, { name: "Clouds", hex: "#ecf0f1" },
-                { name: "Concrete", hex: "#95a5a6" }
-            ],
-            "aussie": [
-                { name: "Beekeeper", hex: "#f6e58d" }, { name: "Spiced Nectarine", hex: "#ffbe76" },
-                { name: "Pink Glamour", hex: "#ff7979" }, { name: "June Bud", hex: "#badc58" },
-                { name: "Coastal Breeze", hex: "#dff9fb" }, { name: "Turbo", hex: "#f9ca24" },
-                { name: "Quince Jelly", hex: "#f0932b" }, { name: "Carmine Pink", hex: "#eb4d4b" },
-                { name: "Pure Apple", hex: "#6ab04c" }, { name: "Hint Of Ice Pack", hex: "#c7ecee" },
-                { name: "Middle Blue", hex: "#7ed6df" }, { name: "Heliotrope", hex: "#e056fd" },
-                { name: "Exodus Fruit", hex: "#686de0" }, { name: "Deep Koamaru", hex: "#30336b" },
-                { name: "Soaring Eagle", hex: "#95afc0" }
-            ],
+            "flat-v1": [{ name: "Turquoise", hex: "#1abc9c" }, { name: "Emerald", hex: "#2ecc71" }, { name: "Peter River", hex: "#3498db" }, { name: "Amethyst", hex: "#9b59b6" }, { name: "Wet Asphalt", hex: "#34495e" }, { name: "Green Sea", hex: "#16a085" }, { name: "Nephritis", hex: "#27ae60" }, { name: "Belize Hole", hex: "#2980b9" }, { name: "Wisteria", hex: "#8e44ad" }, { name: "Midnight Blue", hex: "#2c3e50" }, { name: "Sun Flower", hex: "#f1c40f" }, { name: "Carrot", hex: "#e67e22" }, { name: "Alizarin", hex: "#e74c3c" }, { name: "Clouds", hex: "#ecf0f1" }, { name: "Concrete", hex: "#95a5a6" }],
+            "aussie": [{ name: "Beekeeper", hex: "#f6e58d" }, { name: "Spiced Nectarine", hex: "#ffbe76" }, { name: "Pink Glamour", hex: "#ff7979" }, { name: "June Bud", hex: "#badc58" }, { name: "Coastal Breeze", hex: "#dff9fb" }, { name: "Turbo", hex: "#f9ca24" }, { name: "Quince Jelly", hex: "#f0932b" }, { name: "Carmine Pink", hex: "#eb4d4b" }, { name: "Pure Apple", hex: "#6ab04c" }, { name: "Hint Of Ice Pack", hex: "#c7ecee" }, { name: "Middle Blue", hex: "#7ed6df" }, { name: "Heliotrope", hex: "#e056fd" }, { name: "Exodus Fruit", hex: "#686de0" }, { name: "Deep Koamaru", hex: "#30336b" }, { name: "Soaring Eagle", hex: "#95afc0" }],
             "favorites": savedFavorites
         };
-
         const funMessages = ["COPIED!", "PASTE ME!", "IT'LL ROCK!", "GOT IT!", "RIGHT ONE!", "PERFECT!"];
 
-        // DOM Elements
+        // --- DOM ELEMENTS ---
         const paletteContainer = document.getElementById('palette');
         const overlay = document.getElementById('overlay');
-        const overlayStrip = document.getElementById('overlay-strip');
-        const overlayMsg = document.getElementById('overlay-msg');
-        const copiedTextElem = document.getElementById('copied-text');
-        
         const paletteSelector = document.getElementById('palette-selector');
         const formatSelector = document.getElementById('format-selector');
         const soundToggleBtn = document.getElementById('sound-toggle');
         const themeToggleBtn = document.getElementById('theme-toggle');
-        const exportCssBtn = document.getElementById('export-css');
-
-        const historyToggleBtn = document.getElementById('history-toggle');
-        const historyPanel = document.getElementById('history-panel');
-        const historyBackdrop = document.getElementById('history-backdrop');
-        const closeHistoryBtn = document.getElementById('close-history');
-        const historyList = document.getElementById('history-list');
-        const clearHistoryBtn = document.getElementById('clear-history');
-
-        // Setup awal UI
-        formatSelector.value = savedFormat;
-        paletteSelector.value = savedPalette;
+        
+        // Setup Awal
+        formatSelector.value = savedFormat; paletteSelector.value = savedPalette;
         soundToggleBtn.innerText = isSoundMuted ? "🔇 Muted" : "🔊 Sound";
         themeToggleBtn.innerText = isDarkMode ? "☀️ Light" : "🌙 Dark";
 
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
-        // Toggles
+        // --- SOUND & THEME LOGIC ---
+        function playPopSound() {
+            if (isSoundMuted) return; 
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+            osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
         themeToggleBtn.addEventListener('click', () => {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            themeToggleBtn.innerText = isDarkMode ? "☀️ Light" : "🌙 Dark";
-            localStorage.setItem('fui_darkmode', isDarkMode);
+            isDarkMode = !isDarkMode; document.body.classList.toggle('dark-mode', isDarkMode);
+            themeToggleBtn.innerText = isDarkMode ? "☀️ Light" : "🌙 Dark"; localStorage.setItem('fui_darkmode', isDarkMode);
         });
-
         soundToggleBtn.addEventListener('click', () => {
-            isSoundMuted = !isSoundMuted;
-            soundToggleBtn.innerText = isSoundMuted ? "🔇 Muted" : "🔊 Sound";
-            localStorage.setItem('fui_muted', isSoundMuted);
+            isSoundMuted = !isSoundMuted; soundToggleBtn.innerText = isSoundMuted ? "🔇 Muted" : "🔊 Sound"; localStorage.setItem('fui_muted', isSoundMuted);
         });
 
-        // History Panel Logic
-        function toggleHistoryPanel() {
-            historyPanel.classList.toggle('open');
-            historyBackdrop.classList.toggle('open');
-            renderHistory();
-        }
-
-        historyToggleBtn.addEventListener('click', toggleHistoryPanel);
-        closeHistoryBtn.addEventListener('click', toggleHistoryPanel);
-        historyBackdrop.addEventListener('click', toggleHistoryPanel);
-
-        clearHistoryBtn.addEventListener('click', () => {
-            copyHistory = [];
-            localStorage.setItem('fui_history', JSON.stringify(copyHistory));
-            renderHistory();
-        });
-
-        function addToHistory(name, hex, copiedValue) {
-            // Hapus duplikat jika nilai yang di-copy sama dengan yang sudah ada di history
-            copyHistory = copyHistory.filter(item => item.value !== copiedValue);
-            // Tambahkan ke paling atas
-            copyHistory.unshift({ name: name, hex: hex, value: copiedValue });
-            // Batasi maksimal 20 item
-            if (copyHistory.length > 20) copyHistory.pop();
-            
-            localStorage.setItem('fui_history', JSON.stringify(copyHistory));
-        }
-
-        function renderHistory() {
-            historyList.innerHTML = '';
-            if (copyHistory.length === 0) {
-                historyList.innerHTML = `<p style="text-align:center; color:var(--empty-text); margin-top:20px;">Belum ada riwayat.</p>`;
-                return;
-            }
-
-            copyHistory.forEach(item => {
-                const div = document.createElement('div');
-                div.classList.add('history-item');
-                div.innerHTML = `
-                    <div class="history-color-blob" style="background-color: ${item.hex}"></div>
-                    <div class="history-info">
-                        <span class="history-val">${item.value}</span>
-                        <span class="history-name">${item.name}</span>
-                    </div>
-                `;
-                
-                // Klik riwayat untuk copy ulang
-                div.addEventListener('click', () => {
-                    playPopSound();
-                    navigator.clipboard.writeText(item.value);
-                    showOverlay(item.hex, item.value);
-                    addToHistory(item.name, item.hex, item.value); // Pindahkan ke atas lagi
-                    setTimeout(renderHistory, 100); 
-                });
-
-                historyList.appendChild(div);
-            });
-        }
-
-        // Helpers
+        // --- COLOR CONVERSIONS & MATH ---
         function isLightColor(hex) {
             let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
             return (((r * 299) + (g * 587) + (b * 114)) / 1000) >= 128; 
         }
 
-        function playPopSound() {
-            if (isSoundMuted) return; 
-            if (!audioCtx) audioCtx = new AudioContext();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            
-            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        function getLuminance(r, g, b) {
+            let a = [r, g, b].map(v => {
+                v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            });
+            return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+        }
+
+        function getContrastRatio(hex1, hex2) {
+            let rgb1 = [parseInt(hex1.slice(1,3),16), parseInt(hex1.slice(3,5),16), parseInt(hex1.slice(5,7),16)];
+            let rgb2 = [parseInt(hex2.slice(1,3),16), parseInt(hex2.slice(3,5),16), parseInt(hex2.slice(5,7),16)];
+            let lum1 = getLuminance(...rgb1); let lum2 = getLuminance(...rgb2);
+            let brightest = Math.max(lum1, lum2); let darkest = Math.min(lum1, lum2);
+            return (brightest + 0.05) / (darkest + 0.05);
         }
 
         function hexToRgb(hex) {
             let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
             return `rgb(${r}, ${g}, ${b})`;
         }
-
         function hexToHsl(hex) {
             let r = parseInt(hex.slice(1, 3), 16)/255, g = parseInt(hex.slice(3, 5), 16)/255, b = parseInt(hex.slice(5, 7), 16)/255;
             let max = Math.max(r, g, b), min = Math.min(r, g, b);
             let h, s, l = (max + min) / 2;
             if (max === min) h = s = 0;
             else {
-                let d = max - min;
-                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                switch (max) {
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                    case g: h = (b - r) / d + 2; break;
-                    case b: h = (r - g) / d + 4; break;
-                }
+                let d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; }
                 h /= 6;
             }
-            return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+            return {h: Math.round(h*360), s: Math.round(s*100), l: Math.round(l*100), str: `hsl(${Math.round(h*360)}, ${Math.round(s*100)}%, ${Math.round(l*100)}%)`};
+        }
+        function hslToHex(h, s, l) {
+            l /= 100; const a = s * Math.min(l, 1 - l) / 100;
+            const f = n => { const k = (n + h / 30) % 12; const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1); return Math.round(255 * color).toString(16).padStart(2, '0'); };
+            return `#${f(0)}${f(8)}${f(4)}`;
         }
 
-        // Core Render
+        // --- HISTORY PANEL ---
+        function addToHistory(name, hex, copiedValue) {
+            copyHistory = copyHistory.filter(item => item.value !== copiedValue);
+            copyHistory.unshift({ name, hex, value: copiedValue });
+            if (copyHistory.length > 20) copyHistory.pop();
+            localStorage.setItem('fui_history', JSON.stringify(copyHistory));
+        }
+
+        document.getElementById('history-toggle').addEventListener('click', () => {
+            document.getElementById('history-panel').classList.add('open');
+            document.getElementById('history-backdrop').classList.add('open');
+            renderHistory();
+        });
+        document.getElementById('close-history').addEventListener('click', closeHistory);
+        document.getElementById('history-backdrop').addEventListener('click', closeHistory);
+        function closeHistory() {
+            document.getElementById('history-panel').classList.remove('open');
+            document.getElementById('history-backdrop').classList.remove('open');
+        }
+        document.getElementById('clear-history').addEventListener('click', () => { copyHistory = []; localStorage.setItem('fui_history', '[]'); renderHistory(); });
+
+        function renderHistory() {
+            const list = document.getElementById('history-list'); list.innerHTML = '';
+            if (!copyHistory.length) return list.innerHTML = `<p style="text-align:center; color:var(--empty-text); margin-top:20px;">Belum ada riwayat.</p>`;
+            copyHistory.forEach(item => {
+                const div = document.createElement('div'); div.classList.add('history-item');
+                div.innerHTML = `<div class="history-color-blob" style="background-color: ${item.hex}"></div><div class="history-info"><span class="history-val">${item.value}</span><span class="history-name">${item.name}</span></div>`;
+                div.addEventListener('click', () => { executeCopy(item.name, item.hex, item.value, true); });
+                list.appendChild(div);
+            });
+        }
+
+        // --- SHADES MODAL LOGIC ---
+        const shadesModal = document.getElementById('shades-modal');
+        document.getElementById('close-shades').addEventListener('click', () => shadesModal.classList.remove('open'));
+
+        function openShadesExplorer(colorName, hex) {
+            document.getElementById('shade-title').innerText = `${colorName} - Tints & Shades`;
+            
+            // Contrast Checker
+            const crWhite = getContrastRatio(hex, '#ffffff');
+            const crBlack = getContrastRatio(hex, '#000000');
+            
+            const badgeW = document.getElementById('wcag-white');
+            badgeW.innerText = `Teks Putih: ${crWhite >= 4.5 ? 'Aman (Pass)' : 'Tidak Aman (Fail)'}`;
+            badgeW.className = crWhite >= 4.5 ? 'wcag-badge wcag-pass' : 'wcag-badge wcag-fail';
+
+            const badgeB = document.getElementById('wcag-black');
+            badgeB.innerText = `Teks Hitam: ${crBlack >= 4.5 ? 'Aman (Pass)' : 'Tidak Aman (Fail)'}`;
+            badgeB.className = crBlack >= 4.5 ? 'wcag-badge wcag-pass' : 'wcag-badge wcag-fail';
+
+            // Generate Shades
+            const container = document.getElementById('shades-container');
+            container.innerHTML = '';
+            const hsl = hexToHsl(hex);
+            
+            // Loop lightness dari 90% (terang) ke 10% (gelap)
+            for(let i = 1; i <= 10; i++) {
+                let l = 100 - (i * 9); // 91, 82, 73... 10
+                let newHex = hslToHex(hsl.h, hsl.s, l);
+                
+                const box = document.createElement('div');
+                box.classList.add('shade-box');
+                box.style.backgroundColor = newHex;
+                
+                const isLight = isLightColor(newHex);
+                box.style.color = isLight ? '#000' : '#fff';
+                
+                box.innerHTML = `<span class="shade-pct">${l}%</span><span class="shade-hex">${newHex.toUpperCase()}</span>`;
+                
+                box.addEventListener('click', () => {
+                    let valToCopy = newHex.toUpperCase();
+                    if(formatSelector.value === 'rgb') valToCopy = hexToRgb(newHex);
+                    if(formatSelector.value === 'hsl') valToCopy = hexToHsl(newHex).str;
+                    executeCopy(`${colorName} (${l}%)`, newHex, valToCopy);
+                });
+                
+                container.appendChild(box);
+            }
+            shadesModal.classList.add('open');
+        }
+
+        // --- CORE COPY & RENDER ---
+        function executeCopy(name, hex, valueToCopy, fromHistory = false) {
+            playPopSound();
+            navigator.clipboard.writeText(valueToCopy);
+            
+            // Show Overlay
+            const isLight = isLightColor(hex);
+            overlay.style.backgroundColor = hex;
+            document.getElementById('overlay-msg').innerText = funMessages[Math.floor(Math.random() * funMessages.length)];
+            document.getElementById('copied-text').innerText = valueToCopy;
+            const tColor = isLight ? '#333333' : '#ffffff';
+            document.getElementById('overlay-msg').style.color = tColor;
+            document.getElementById('copied-text').style.color = tColor;
+            
+            const strip = document.getElementById('overlay-strip');
+            if (isLight) { strip.classList.add('dark-strip'); document.getElementById('overlay-msg').style.textShadow = 'none'; }
+            else { strip.classList.remove('dark-strip'); document.getElementById('overlay-msg').style.textShadow = '2px 2px 4px rgba(0,0,0,0.2)'; }
+            
+            overlay.classList.add('show');
+            setTimeout(() => overlay.classList.remove('show'), 1200);
+
+            addToHistory(name, hex, valueToCopy);
+            if(fromHistory) setTimeout(renderHistory, 100);
+        }
+
         function renderPalette(paletteKey) {
             paletteContainer.innerHTML = ''; 
             const colors = palettes[paletteKey];
 
             if (paletteKey === 'favorites') {
-                const addBox = document.createElement('div');
-                addBox.classList.add('color-box', 'add-color-box');
+                const addBox = document.createElement('div'); addBox.classList.add('color-box', 'add-color-box');
                 addBox.innerHTML = `<span class="color-name">+ ADD COLOR</span><input type="color" id="custom-color-picker">`;
-
                 addBox.querySelector('input').addEventListener('input', (e) => {
-                    const newHex = e.target.value;
-                    let newName = prompt("Beri nama untuk warna ini:", "Custom Color");
-                    if (newName !== null) {
-                        palettes['favorites'].push({ name: newName.trim() || "Custom Color", hex: newHex });
-                        localStorage.setItem('fui_favorites', JSON.stringify(palettes['favorites']));
-                        renderPalette('favorites');
+                    let name = prompt("Beri nama untuk warna ini:", "Custom Color");
+                    if (name !== null) {
+                        palettes['favorites'].push({ name: name.trim() || "Custom", hex: e.target.value });
+                        localStorage.setItem('fui_favorites', JSON.stringify(palettes['favorites'])); renderPalette('favorites');
                     }
                 });
                 paletteContainer.appendChild(addBox);
             }
 
             if (paletteKey === 'favorites' && colors.length === 0) {
-                const emptyMsg = document.createElement('div');
-                emptyMsg.classList.add('empty-favorites');
-                emptyMsg.innerText = "Klik kanan pada warna dari palette lain, atau klik + ADD COLOR!";
-                paletteContainer.appendChild(emptyMsg);
-                return;
+                paletteContainer.innerHTML += `<div class="empty-favorites">Klik kanan pada warna, atau klik + ADD COLOR!</div>`; return;
             }
 
             colors.forEach(color => {
-                const colorBox = document.createElement('div');
-                colorBox.classList.add('color-box');
-                colorBox.style.backgroundColor = color.hex;
+                const box = document.createElement('div'); box.classList.add('color-box'); box.style.backgroundColor = color.hex;
                 
-                const colorName = document.createElement('span');
-                colorName.classList.add('color-name');
-                colorName.innerText = color.name;
-                colorName.style.color = isLightColor(color.hex) ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)';
+                const name = document.createElement('span'); name.classList.add('color-name'); name.innerText = color.name;
+                const isLight = isLightColor(color.hex);
+                name.style.color = isLight ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)';
 
-                colorBox.appendChild(colorName);
+                // Tints Button (Ikon Kaca Pembesar)
+                const tintsBtn = document.createElement('button');
+                tintsBtn.classList.add('tints-btn');
+                if (isLight) tintsBtn.classList.add('dark-btn');
+                tintsBtn.innerText = '🔍 Shades';
+                tintsBtn.title = "Lihat Variasi Kecerahan Warna";
 
-                // Copy Action
-                colorBox.addEventListener('click', (e) => {
-                    if(e.target.tagName.toLowerCase() === 'input') return;
-                    const format = formatSelector.value;
-                    let textToCopy = color.hex.toUpperCase();
-                    if (format === 'rgb') textToCopy = hexToRgb(color.hex);
-                    else if (format === 'hsl') textToCopy = hexToHsl(color.hex);
-                    
-                    playPopSound();
-                    navigator.clipboard.writeText(textToCopy);
-                    showOverlay(color.hex, textToCopy);
-                    addToHistory(color.name, color.hex, textToCopy);
+                tintsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Mencegah memicu copy warna dasar
+                    openShadesExplorer(color.name, color.hex);
                 });
 
-                // Add/Remove Favorites
-                colorBox.addEventListener('contextmenu', (e) => {
+                box.appendChild(name); box.appendChild(tintsBtn);
+
+                // Copy Action
+                box.addEventListener('click', (e) => {
+                    if(e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'button') return;
+                    let val = color.hex.toUpperCase();
+                    if (formatSelector.value === 'rgb') val = hexToRgb(color.hex);
+                    else if (formatSelector.value === 'hsl') val = hexToHsl(color.hex).str;
+                    executeCopy(color.name, color.hex, val);
+                });
+
+                // Favorites Action
+                box.addEventListener('contextmenu', (e) => {
                     e.preventDefault(); 
                     const idx = palettes['favorites'].findIndex(c => c.hex === color.hex);
-                    if (idx > -1) {
-                        palettes['favorites'].splice(idx, 1);
-                        colorName.innerText = "REMOVED";
-                    } else {
-                        palettes['favorites'].push(color);
-                        colorName.innerText = "⭐ ADDED";
-                    }
+                    if (idx > -1) { palettes['favorites'].splice(idx, 1); name.innerText = "REMOVED"; } 
+                    else { palettes['favorites'].push(color); name.innerText = "⭐ ADDED"; }
                     localStorage.setItem('fui_favorites', JSON.stringify(palettes['favorites']));
-                    setTimeout(() => { colorName.innerText = color.name; }, 1000);
+                    setTimeout(() => { name.innerText = color.name; }, 1000);
                     if (paletteSelector.value === 'favorites') setTimeout(() => renderPalette('favorites'), 500);
                 });
 
-                paletteContainer.appendChild(colorBox);
+                paletteContainer.appendChild(box);
             });
         }
 
-        // Overlay & Event Listeners
-        function showOverlay(bgHex, copiedText) {
-            const isLight = isLightColor(bgHex);
-            overlay.style.backgroundColor = bgHex;
-            overlayMsg.innerText = funMessages[Math.floor(Math.random() * funMessages.length)];
-            copiedTextElem.innerText = copiedText;
-            
-            const textColor = isLight ? '#333333' : '#ffffff';
-            overlayMsg.style.color = textColor;
-            copiedTextElem.style.color = textColor;
-            
-            if (isLight) {
-                overlayStrip.classList.add('dark-strip');
-                overlayMsg.style.textShadow = 'none';
-            } else {
-                overlayStrip.classList.remove('dark-strip');
-                overlayMsg.style.textShadow = '2px 2px 4px rgba(0,0,0,0.2)';
-            }
-            
-            overlay.classList.add('show');
-            setTimeout(() => overlay.classList.remove('show'), 1200);
-        }
-
-        exportCssBtn.addEventListener('click', () => {
+        // Export CSS
+        document.getElementById('export-css').addEventListener('click', () => {
             const colors = palettes[paletteSelector.value];
             if (!colors.length) return alert("Palette kosong!");
-            let css = `/* Generated from Flat UI Clone v7.0 */\n:root {\n`;
+            let css = `/* Generated from Flat UI Clone v8.0 */\n:root {\n`;
             colors.forEach((c, i) => { css += `  --color-${(c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') || `color-${i}`)}: ${c.hex};\n`; });
             css += `}\n`;
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(new Blob([css], { type: 'text/css' }));
-            link.download = `${paletteSelector.value}-palette.css`;
-            link.click();
+            const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([css], { type: 'text/css' }));
+            link.download = `${paletteSelector.value}-palette.css`; link.click();
         });
 
+        // Listeners
         formatSelector.addEventListener('change', e => localStorage.setItem('fui_format', e.target.value));
-        paletteSelector.addEventListener('change', e => {
-            localStorage.setItem('fui_palette', e.target.value);
-            renderPalette(e.target.value);
-        });
+        paletteSelector.addEventListener('change', e => { localStorage.setItem('fui_palette', e.target.value); renderPalette(e.target.value); });
 
+        // Init
         renderPalette(savedPalette);
     </script>
 
